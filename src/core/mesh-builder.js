@@ -231,28 +231,29 @@ export class MeshBuilder {
         maxThickness
       )
 
-      // 완전히 새로운 접근:
-      // 1. 평면은 XY 평면에 있고, Z축이 두께 방향
-      // 2. 면이 중심을 "바라보도록" 배치
-      // 3. 각 면의 "뒷면"이 바깥을 향해야 함 (리소페인은 뒤에서 빛을 비춤)
+      // 핵심 개념:
+      // - buildFlatLithophane은 XY 평면에 면을 만듦
+      // - Z+ 방향이 앞면 (얇은 부분), Z- 방향이 뒷면 (두꺼운 부분)
+      // - 리소페인은 뒤에서 빛을 비추므로, Z- 방향이 바깥을 향해야 함
+      // - 즉, Z+ 방향이 중심을 향해야 함
 
-      const matrix = new THREE.Matrix4()
-
-      // Step 1: Y축 중심 90도 회전 - XY 평면 -> YZ 평면
-      const rot90 = new THREE.Matrix4().makeRotationY(-Math.PI / 2)
-
-      // Step 2: Y축 중심으로 해당 면의 위치까지 회전
-      const rotToAngle = new THREE.Matrix4().makeRotationY(-angle)
-
-      // Step 3: 회전 적용 (순서 중요!)
-      matrix.multiply(rotToAngle).multiply(rot90)
-
-      // Step 4: 중심에서 바깥으로 이동
+      // 각 면의 위치 계산
       const tx = Math.cos(angle) * radius
       const tz = Math.sin(angle) * radius
-      const translation = new THREE.Matrix4().makeTranslation(tx, 0, tz)
 
-      matrix.premultiply(translation)
+      // 변환 행렬 생성
+      const matrix = new THREE.Matrix4()
+
+      // 1. Y축 중심 90도 회전 (XY평면 -> YZ평면, Z+가 X+ 방향을 향함)
+      matrix.makeRotationY(Math.PI / 2)
+
+      // 2. Y축 중심으로 angle만큼 회전 (Z+가 중심을 향하도록)
+      const rotateMatrix = new THREE.Matrix4().makeRotationY(angle)
+      matrix.premultiply(rotateMatrix)
+
+      // 3. 위치로 이동
+      const translationMatrix = new THREE.Matrix4().makeTranslation(tx, 0, tz)
+      matrix.premultiply(translationMatrix)
 
       console.log(`Face ${i}: angle=${(angle * 180 / Math.PI).toFixed(1)}°, position=(${tx.toFixed(2)}, 0, ${tz.toFixed(2)})`)
 
