@@ -223,20 +223,26 @@ export class MeshBuilder {
       )
 
       // 각 면을 올바른 위치와 방향으로 회전 및 배치
-      const matrix = new THREE.Matrix4()
+      // 1. 먼저 90도 회전 (면이 XY 평면에서 YZ 평면으로)
+      const rotateToVertical = new THREE.Matrix4().makeRotationY(Math.PI / 2)
 
-      // 1. Y축 중심으로 회전 (면이 중심을 향하도록)
-      matrix.makeRotationY(angle)
+      // 2. 해당 면의 각도만큼 회전
+      const rotateToPosition = new THREE.Matrix4().makeRotationY(angle)
 
-      // 2. 중심에서 바깥쪽으로 이동
-      const position = new THREE.Vector3(
+      // 3. 중심에서 바깥쪽으로 이동
+      const translateOut = new THREE.Matrix4().makeTranslation(
         Math.cos(angle) * radius,
         0,
         Math.sin(angle) * radius
       )
-      matrix.setPosition(position)
 
-      faceGeometry.applyMatrix4(matrix)
+      // 변환 적용 순서: 수직 회전 -> 위치 회전 -> 이동
+      const finalMatrix = new THREE.Matrix4()
+      finalMatrix.multiply(translateOut)
+      finalMatrix.multiply(rotateToPosition)
+      finalMatrix.multiply(rotateToVertical)
+
+      faceGeometry.applyMatrix4(finalMatrix)
       geometries.push(faceGeometry)
     }
 
