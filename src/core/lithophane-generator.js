@@ -13,14 +13,14 @@ export class LithophaneGenerator {
    * @returns {THREE.BufferGeometry} 생성된 3D 지오메트리
    */
   async generate(options) {
-    const { type, images, dimensions, adjustmentMode, includeTop, includeBottom } = options
+    const { type, images, dimensions, adjustmentMode, resolution, includeTop, includeBottom } = options
 
     if (type === 'flat') {
-      return this.generateFlat(images[0], dimensions, adjustmentMode)
+      return this.generateFlat(images[0], dimensions, adjustmentMode, resolution)
     } else if (type === 'cylinder') {
-      return this.generateCylinder(images[0], dimensions, adjustmentMode, includeTop, includeBottom)
+      return this.generateCylinder(images[0], dimensions, adjustmentMode, resolution, includeTop, includeBottom)
     } else if (type === 'prism') {
-      return this.generatePrism(images, dimensions, adjustmentMode, includeTop, includeBottom)
+      return this.generatePrism(images, dimensions, adjustmentMode, resolution, includeTop, includeBottom)
     }
 
     throw new Error('Unknown lithophane type')
@@ -29,11 +29,10 @@ export class LithophaneGenerator {
   /**
    * 평면형 리소페인 생성
    */
-  generateFlat(image, dimensions, adjustmentMode) {
+  generateFlat(image, dimensions, adjustmentMode, resolution = 2) {
     const { width, height, minThickness, maxThickness } = dimensions
 
     // 해상도 설정 (mm당 픽셀 수)
-    const resolution = 2 // 2 pixels per mm
     const targetWidth = Math.floor(width * resolution)
     const targetHeight = Math.floor(height * resolution)
 
@@ -58,11 +57,10 @@ export class LithophaneGenerator {
   /**
    * 원통형 리소페인 생성
    */
-  generateCylinder(image, dimensions, adjustmentMode, includeTop, includeBottom) {
+  generateCylinder(image, dimensions, adjustmentMode, resolution = 2, includeTop, includeBottom) {
     const { diameter, height, minThickness, maxThickness } = dimensions
 
     // 해상도 설정
-    const resolution = 2
     const circumference = Math.PI * diameter
     const targetWidth = Math.floor(circumference * resolution)
     const targetHeight = Math.floor(height * resolution)
@@ -90,14 +88,13 @@ export class LithophaneGenerator {
   /**
    * n각기둥형 리소페인 생성
    */
-  generatePrism(images, dimensions, adjustmentMode, includeTop, includeBottom) {
+  generatePrism(images, dimensions, adjustmentMode, resolution = 2, includeTop, includeBottom) {
     const { sides, radius, height, minThickness, maxThickness } = dimensions
 
     // 각 면의 너비 계산
     const sideWidth = 2 * radius * Math.sin(Math.PI / sides)
 
     // 해상도 설정
-    const resolution = 2
     const targetWidth = Math.floor(sideWidth * resolution)
     const targetHeight = Math.floor(height * resolution)
 

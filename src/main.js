@@ -13,6 +13,7 @@ class App {
       images: [],
       dimensions: {},
       adjustmentMode: 'fit',
+      resolution: 2,
       includeTop: false,
       includeBottom: false,
       lithophaneModel: null
@@ -37,6 +38,9 @@ class App {
 
     // 이미지 조정 버튼 이벤트
     this.setupAdjustmentButtons()
+
+    // 해상도 슬라이더 이벤트
+    this.setupResolutionControl()
 
     // 추가 옵션 이벤트
     this.setupAdditionalOptions()
@@ -95,6 +99,17 @@ class App {
     buttons[1].click() // 'fit' 모드
   }
 
+  setupResolutionControl() {
+    const slider = document.getElementById('resolution-slider')
+    const valueDisplay = document.getElementById('resolution-value')
+
+    slider.addEventListener('input', (e) => {
+      const value = parseFloat(e.target.value)
+      this.state.resolution = value
+      valueDisplay.textContent = value
+    })
+  }
+
   setupAdditionalOptions() {
     document.getElementById('include-top').addEventListener('change', (e) => {
       this.state.includeTop = e.target.checked
@@ -123,6 +138,7 @@ class App {
         images: this.state.images,
         dimensions: this.state.dimensions,
         adjustmentMode: this.state.adjustmentMode,
+        resolution: this.state.resolution,
         includeTop: this.state.includeTop,
         includeBottom: this.state.includeBottom
       })
