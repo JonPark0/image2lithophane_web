@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image to Lithophane Converter</title>
+  <meta name="description" content="이미지를 리소페인(Lithophane) 3D 모델로 변환하는 웹 애플리케이션">
+  <script type="module" crossorigin src="/image2lithophane_web/assets/index-C3cMgbIB.js"></script>
+  <link rel="stylesheet" crossorigin href="/image2lithophane_web/assets/index-eOb51FrQ.css">
+</head>
+<body>
+  <div id="app">
+    <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+      <div class="container mx-auto px-4 py-6">
+        <h1 class="text-3xl font-bold">Image to Lithophane Converter</h1>
+        <p class="mt-2 text-blue-100">이미지를 3D 리소페인 모델로 변환하세요</p>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+      <!-- 리소페인 타입 선택 섹션 -->
+      <section id="type-selector" class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">1. 리소페인 타입 선택</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- 평면형 -->
+          <button class="lithophane-type-btn p-6 border-2 rounded-lg hover:border-blue-500 hover:shadow-lg transition-all" data-type="flat">
+            <div class="text-4xl mb-2">▭</div>
+            <h3 class="text-xl font-semibold mb-2">평면형</h3>
+            <p class="text-gray-600 text-sm">단일 이미지로 생성하는 평면 리소페인</p>
+          </button>
+
+          <!-- 원통형 -->
+          <button class="lithophane-type-btn p-6 border-2 rounded-lg hover:border-blue-500 hover:shadow-lg transition-all" data-type="cylinder">
+            <div class="text-4xl mb-2">⬭</div>
+            <h3 class="text-xl font-semibold mb-2">원통형</h3>
+            <p class="text-gray-600 text-sm">곡면에 이미지가 배치되는 원통형</p>
+          </button>
+
+          <!-- n각기둥형 -->
+          <button class="lithophane-type-btn p-6 border-2 rounded-lg hover:border-blue-500 hover:shadow-lg transition-all" data-type="prism">
+            <div class="text-4xl mb-2">⬢</div>
+            <h3 class="text-xl font-semibold mb-2">n각기둥형</h3>
+            <p class="text-gray-600 text-sm">다중 이미지를 각 면에 배치 (3~8면)</p>
+          </button>
+        </div>
+      </section>
+
+      <!-- 설정 영역 (타입 선택 후 표시) -->
+      <div id="settings-area" class="hidden">
+        <!-- 이미지 업로드 섹션 -->
+        <section id="image-upload" class="mb-8">
+          <h2 class="text-2xl font-bold mb-4">2. 이미지 업로드</h2>
+          <div id="upload-container" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+            <p class="text-gray-500">이미지를 드래그하거나 클릭하여 업로드하세요</p>
+          </div>
+        </section>
+
+        <!-- 치수 설정 섹션 -->
+        <section id="dimensions" class="mb-8">
+          <h2 class="text-2xl font-bold mb-4">3. 치수 설정</h2>
+          <div id="dimension-controls" class="space-y-4">
+            <!-- JavaScript로 동적 생성 -->
+          </div>
+        </section>
+
+        <!-- 이미지 조정 섹션 -->
+        <section id="image-adjustment" class="mb-8">
+          <h2 class="text-2xl font-bold mb-4">4. 이미지 조정</h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <button class="adjustment-btn p-4 border-2 rounded-lg hover:border-blue-500 transition-all" data-mode="stretch">
+              <div class="font-semibold">늘리기 (Stretch)</div>
+              <p class="text-sm text-gray-600 mt-1">비율 무시</p>
+            </button>
+            <button class="adjustment-btn p-4 border-2 rounded-lg hover:border-blue-500 transition-all" data-mode="fit">
+              <div class="font-semibold">맞추기 (Fit)</div>
+              <p class="text-sm text-gray-600 mt-1">비율 유지</p>
+            </button>
+            <button class="adjustment-btn p-4 border-2 rounded-lg hover:border-blue-500 transition-all" data-mode="cover">
+              <div class="font-semibold">채우기 (Cover)</div>
+              <p class="text-sm text-gray-600 mt-1">여백 없음</p>
+            </button>
+            <button class="adjustment-btn p-4 border-2 rounded-lg hover:border-blue-500 transition-all" data-mode="tile">
+              <div class="font-semibold">타일 (Tile)</div>
+              <p class="text-sm text-gray-600 mt-1">바둑판식</p>
+            </button>
+          </div>
+        </section>
+
+        <!-- 추가 옵션 (원통형, n각기둥형) -->
+        <section id="additional-options" class="mb-8 hidden">
+          <h2 class="text-2xl font-bold mb-4">5. 추가 옵션</h2>
+          <div class="space-y-2">
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" id="include-top" class="rounded">
+              <span>윗면 생성</span>
+            </label>
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" id="include-bottom" class="rounded">
+              <span>밑면 생성</span>
+            </label>
+          </div>
+        </section>
+
+        <!-- 변환 버튼 -->
+        <div class="mb-8">
+          <button id="convert-btn" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-lg font-bold text-lg hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            변환하기
+          </button>
+        </div>
+
+        <!-- 3D 미리보기 섹션 -->
+        <section id="preview" class="mb-8 hidden">
+          <h2 class="text-2xl font-bold mb-4">미리보기</h2>
+          <div id="preview-container" class="bg-gray-100 rounded-lg" style="height: 500px;">
+            <!-- Three.js 렌더링 영역 -->
+          </div>
+        </section>
+
+        <!-- 다운로드 섹션 -->
+        <section id="download" class="hidden">
+          <button id="download-btn" class="w-full bg-green-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition-all">
+            STL 파일 다운로드
+          </button>
+        </section>
+      </div>
+    </main>
+
+    <footer class="bg-gray-100 mt-16 py-6">
+      <div class="container mx-auto px-4 text-center text-gray-600">
+        <p>Image to Lithophane Converter</p>
+        <p class="text-sm mt-2">Made with Vite + Tailwind CSS + Three.js</p>
+      </div>
+    </footer>
+  </div>
+
+</body>
+</html>
