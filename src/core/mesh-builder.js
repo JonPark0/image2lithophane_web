@@ -210,8 +210,17 @@ export class MeshBuilder {
     // 각 면의 너비 계산
     const sideWidth = 2 * radius * Math.sin(Math.PI / sides)
 
+    console.log(`Building ${sides}-sided prism:`, {
+      radius,
+      sideWidth,
+      height,
+      minThickness,
+      maxThickness
+    })
+
     // 각 면에 대한 평면 리소페인 생성
     for (let i = 0; i < sides; i++) {
+      // 각 면의 중심 각도
       const angle = (i / sides) * Math.PI * 2
 
       const faceGeometry = this.buildFlatLithophane(
@@ -222,27 +231,32 @@ export class MeshBuilder {
         maxThickness
       )
 
-      // 각 면을 올바른 위치와 방향으로 회전 및 배치
-      // 1. 먼저 90도 회전 (면이 XY 평면에서 YZ 평면으로)
-      const rotateToVertical = new THREE.Matrix4().makeRotationY(Math.PI / 2)
+      // 완전히 새로운 접근:
+      // 1. 평면은 XY 평면에 있고, Z축이 두께 방향
+      // 2. 면이 중심을 "바라보도록" 배치
+      // 3. 각 면의 "뒷면"이 바깥을 향해야 함 (리소페인은 뒤에서 빛을 비춤)
 
-      // 2. 해당 면의 각도만큼 회전
-      const rotateToPosition = new THREE.Matrix4().makeRotationY(angle)
+      const matrix = new THREE.Matrix4()
 
-      // 3. 중심에서 바깥쪽으로 이동
-      const translateOut = new THREE.Matrix4().makeTranslation(
-        Math.cos(angle) * radius,
-        0,
-        Math.sin(angle) * radius
-      )
+      // Step 1: Y축 중심 90도 회전 - XY 평면 -> YZ 평면
+      const rot90 = new THREE.Matrix4().makeRotationY(-Math.PI / 2)
 
-      // 변환 적용 순서: 수직 회전 -> 위치 회전 -> 이동
-      const finalMatrix = new THREE.Matrix4()
-      finalMatrix.multiply(translateOut)
-      finalMatrix.multiply(rotateToPosition)
-      finalMatrix.multiply(rotateToVertical)
+      // Step 2: Y축 중심으로 해당 면의 위치까지 회전
+      const rotToAngle = new THREE.Matrix4().makeRotationY(-angle)
 
-      faceGeometry.applyMatrix4(finalMatrix)
+      // Step 3: 회전 적용 (순서 중요!)
+      matrix.multiply(rotToAngle).multiply(rot90)
+
+      // Step 4: 중심에서 바깥으로 이동
+      const tx = Math.cos(angle) * radius
+      const tz = Math.sin(angle) * radius
+      const translation = new THREE.Matrix4().makeTranslation(tx, 0, tz)
+
+      matrix.premultiply(translation)
+
+      console.log(`Face ${i}: angle=${(angle * 180 / Math.PI).toFixed(1)}°, position=(${tx.toFixed(2)}, 0, ${tz.toFixed(2)})`)
+
+      faceGeometry.applyMatrix4(matrix)
       geometries.push(faceGeometry)
     }
 
