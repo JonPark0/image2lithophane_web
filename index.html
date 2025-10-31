@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Image to Lithophane Converter</title>
   <meta name="description" content="이미지를 리소페인(Lithophane) 3D 모델로 변환하는 웹 애플리케이션">
-  <script type="module" crossorigin src="/image2lithophane_web/assets/index-C3cMgbIB.js"></script>
-  <link rel="stylesheet" crossorigin href="/image2lithophane_web/assets/index-eOb51FrQ.css">
+  <script type="module" crossorigin src="/image2lithophane_web/assets/index-CqfW43gM.js"></script>
+  <link rel="stylesheet" crossorigin href="/image2lithophane_web/assets/index-BHGjmiQc.css">
 </head>
 <body>
   <div id="app">
@@ -86,9 +86,21 @@
           </div>
         </section>
 
+        <!-- 해상도 설정 섹션 -->
+        <section id="resolution-control" class="mb-8">
+          <h2 class="text-2xl font-bold mb-4">5. 해상도 설정</h2>
+          <div class="control-group">
+            <label class="control-label">
+              해상도 (pixels per mm): <span id="resolution-value">2</span>
+            </label>
+            <input type="range" id="resolution-slider" class="slider-input" min="1" max="5" step="0.5" value="2">
+            <p class="text-sm text-gray-600 mt-2">높을수록 더 세밀하지만 처리 시간이 오래 걸립니다</p>
+          </div>
+        </section>
+
         <!-- 추가 옵션 (원통형, n각기둥형) -->
         <section id="additional-options" class="mb-8 hidden">
-          <h2 class="text-2xl font-bold mb-4">5. 추가 옵션</h2>
+          <h2 class="text-2xl font-bold mb-4">6. 추가 옵션</h2>
           <div class="space-y-2">
             <label class="flex items-center space-x-2">
               <input type="checkbox" id="include-top" class="rounded">
